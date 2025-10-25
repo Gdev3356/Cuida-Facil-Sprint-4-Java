@@ -1,22 +1,24 @@
 package br.com.fiap.resource;
 
+import br.com.fiap.bo.UnidadeBO;
+import br.com.fiap.to.UnidadeTO;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import java.util.ArrayList;
+import java.util.List;
 
-@Path("/unidade")
+@Path("/unidades")
 public class UnidadeResource {
-    private RemedioBO remedioBO = new RemedioBO();
+    private UnidadeBO unidadeBO = new UnidadeBO();
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response findAll() {
-        ArrayList<RemedioTO> resultado = remedioBO.findAll();
+        List<UnidadeTO> resultado = unidadeBO.findAll();
         Response.ResponseBuilder response = null;
-        if (resultado != null) {
+        if (resultado != null && !resultado.isEmpty()) {
             response = Response.ok(); // 200 - OK
         }
         else {
@@ -27,10 +29,10 @@ public class UnidadeResource {
     }
 
     @GET
-    @Path("/{codigo}")
+    @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response findByCodigo(@PathParam("codigo") Long codigo) {
-        RemedioTO resultado = remedioBO.findByCodigo(codigo);
+    public Response findById(@PathParam("id") Long id) { // Padronizado para Long
+        UnidadeTO resultado = unidadeBO.findById(id);
         Response.ResponseBuilder response = null;
         if (resultado != null) {
             response = Response.ok();  // 200 (OK)
@@ -43,23 +45,23 @@ public class UnidadeResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response save(@Valid RemedioTO remedio) {
-        RemedioTO resultado = remedioBO.save(remedio);
+    public Response save(@Valid UnidadeTO unidade) {
+        UnidadeTO resultado = unidadeBO.save(unidade);
         Response.ResponseBuilder response = null;
         if (resultado != null){
             response = Response.created(null);  // 201 - CREATED
         } else {
-            response = Response.status(400);  // 401 - BAD REQUEST
+            response = Response.status(400);  // 400 - BAD REQUEST (falha na validação de negócio/DAO)
         }
         response.entity(resultado);
         return response.build();
     }
 
     @DELETE
-    @Path("/{codigo}")
-    public Response delete(@PathParam("codigo") Long codigo) {
+    @Path("/{id}")
+    public Response delete(@PathParam("id") Long id) {
         Response.ResponseBuilder response = null;
-        if (remedioBO.delete(codigo)){
+        if (unidadeBO.delete(id)){
             response = Response.status(204);  // 204 - NO CONTENT
         } else {
             response = Response.status(404);  // 404 - NOT FOUND
@@ -68,16 +70,17 @@ public class UnidadeResource {
     }
 
     @PUT
-    @Path("/{codigo}")
+    @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response update(@Valid RemedioTO remedio, @PathParam("codigo") Long codigo) {
-        remedio.setCodigo(codigo);
-        RemedioTO resultado = remedioBO.update(remedio);
+    public Response update(@Valid UnidadeTO unidade, @PathParam("id") Long id) { // Padronizado para Long
+        unidade.setId(id);
+        UnidadeTO resultado = unidadeBO.update(unidade);
         Response.ResponseBuilder response = null;
+
         if (resultado != null){
-            response = Response.created(null);  // 201 - CREATED
+            response = Response.created(null);  // 201 - CREATED (embora 200 OK ou 204 NO CONTENT seja mais comum para PUT)
         } else {
-            response = Response.status(400);  // 400 - BAD REQUEST
+            response = Response.status(400);  // 400 - BAD REQUEST (ou 404 se o ID não existir)
         }
         response.entity(resultado);
         return response.build();

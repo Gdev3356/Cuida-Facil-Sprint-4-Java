@@ -1,16 +1,35 @@
 package br.com.fiap.bo;
 
 import br.com.fiap.dao.UnidadeDAO;
-import br.com.fiap.to.RemedioTO;
+import br.com.fiap.to.UnidadeTO;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class UnidadeBO {
     private UnidadeDAO unidadeDAO;
 
-    public ArrayList<RemedioTO> findAll(){
+    public List<UnidadeTO> findAll() {
         unidadeDAO = new UnidadeDAO();
-        //aqui se implementa regras de negócio
         return unidadeDAO.findAll();
+    }
+
+    public UnidadeTO findById(Long id) {
+        unidadeDAO = new UnidadeDAO();
+        return unidadeDAO.findById(id);
+    }
+
+    public UnidadeTO save (UnidadeTO unidade) {
+        unidadeDAO = new UnidadeDAO();
+        return unidadeDAO.save(unidade);
+    }
+
+    public boolean delete(Long id) {
+        unidadeDAO = new UnidadeDAO();
+        return unidadeDAO.delete(id);
+    }
+
+    public UnidadeTO update(UnidadeTO unidade) {
+        unidadeDAO = new UnidadeDAO();
+        return unidadeDAO.update(unidade);
     }
 }

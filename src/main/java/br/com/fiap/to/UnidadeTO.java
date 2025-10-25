@@ -1,41 +1,47 @@
 package br.com.fiap.to;
 
-import java.util.List;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 public class UnidadeTO {
-    private int id;
-    private String nome;
+
+    private Long id;
+
+    @NotBlank(message = "O código da unidade é obrigatório")
+    @Size(min = 1, max = 10, message = "O código deve ter no máximo 10 caracteres")
+    private String cdUnidade;
+
+    @NotBlank(message = "O endereço é obrigatório")
+    @Size(max = 100, message = "O endereço deve ter no máximo 100 caracteres")
     private String endereco;
+
+    @NotBlank(message = "O CEP é obrigatório")
+    @Size(min = 8, max = 8, message = "O CEP deve ter 8 dígitos")
+    private String cep;
+
+    @Size(max = 20, message = "O telefone deve ter no máximo 20 caracteres")
     private String telefone;
-    private String horario;
-    private List<String> servicos;
 
-    public UnidadeTO() {}
-
-    public UnidadeTO(int id, String nome, String endereco, String telefone, String horario, List<String> servicos) {
-        this.id = id;
-        this.nome = nome;
-        this.endereco = endereco;
-        this.telefone = telefone;
-        this.horario = horario;
-        this.servicos = servicos;
+    public UnidadeTO() {
     }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
+    public UnidadeTO(Long id, String cdUnidade, String endereco, String cep, String telefone) {
+        this.id = id;
+        this.cdUnidade = cdUnidade;
+        this.endereco = endereco;
+        this.cep = cep;
+        this.telefone = telefone;
+    }
+
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getCdUnidade() { return cdUnidade; }
+    public void setCdUnidade(String cdUnidade) { this.cdUnidade = cdUnidade; }
     public String getEndereco() { return endereco; }
     public void setEndereco(String endereco) { this.endereco = endereco; }
+    public String getCep() { return cep; }
+    public void setCep(String cep) { this.cep = cep; }
     public String getTelefone() { return telefone; }
     public void setTelefone(String telefone) { this.telefone = telefone; }
-    public String getHorario() { return horario; }
-    public void setHorario(String horario) { this.horario = horario; }
-    public List<String> getServicos() { return servicos; }
-    public void setServicos(List<String> servicos) { this.servicos = servicos; }
-
-    public String getServicosFormatados() {
-        if (servicos == null || servicos.isEmpty()) return "Nenhum serviço listado.";
-        return String.join("\n- ", servicos);
-    }
 }
