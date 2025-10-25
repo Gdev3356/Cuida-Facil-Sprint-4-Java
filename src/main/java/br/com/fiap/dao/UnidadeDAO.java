@@ -10,22 +10,20 @@ import java.util.List;
 
 public class UnidadeDAO {
 
-    private static final String TABLE_NAME = "T_CUIDA_FACIL_UNIDADES";
-    private static final String ALL_COLUMNS = "ID_UNIDADE, CD_UNIDADE, END_UNIDADE, CEP_UNIDADE, TEL_UNIDADE";
-
     private UnidadeTO mapResultSetToTO(ResultSet rs) throws SQLException {
         UnidadeTO unidade = new UnidadeTO();
-        unidade.setId(rs.getLong("ID_UNIDADE"));
+        unidade.setIdUnidade(rs.getLong("ID_UNIDADE"));
         unidade.setCdUnidade(rs.getString("CD_UNIDADE"));
         unidade.setEndereco(rs.getString("END_UNIDADE"));
-        unidade.setCep(rs.getString("CEP_UNIDADE"));
         unidade.setTelefone(rs.getString("TEL_UNIDADE"));
+        unidade.setHorario(rs.getString("HR_UNIDADE"));
+        unidade.setCep(rs.getString("CEP_UNIDADE"));
         return unidade;
     }
 
     public List<UnidadeTO> findAll() {
         List<UnidadeTO> unidades = new ArrayList<>();
-        String sql = "SELECT " + ALL_COLUMNS + " FROM " + TABLE_NAME + " ORDER BY ID_UNIDADE";
+        String sql = "SELECT ID_UNIDADE, CD_UNIDADE, END_UNIDADE, TEL_UNIDADE, HR_UNIDADE, CEP_UNIDADE FROM T_CUIDA_FACIL_UNIDADES ORDER BY ID_UNIDADE";
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -41,7 +39,7 @@ public class UnidadeDAO {
 
     public UnidadeTO findById(Long id) {
         UnidadeTO unidade = null;
-        String sql = "SELECT " + ALL_COLUMNS + " FROM " + TABLE_NAME + " WHERE ID_UNIDADE = ?";
+        String sql = "SELECT ID_UNIDADE, CD_UNIDADE, END_UNIDADE, TEL_UNIDADE, HR_UNIDADE, CEP_UNIDADE FROM T_CUIDA_FACIL_UNIDADES WHERE ID_UNIDADE = ?";
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
@@ -57,12 +55,13 @@ public class UnidadeDAO {
     }
 
     public UnidadeTO save(UnidadeTO unidade) {
-        String sql = "INSERT INTO " + TABLE_NAME + " (CD_UNIDADE, END_UNIDADE, CEP_UNIDADE, TEL_UNIDADE) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO T_CUIDA_FACIL_UNIDADES (CD_UNIDADE, END_UNIDADE, TEL_UNIDADE, HR_UNIDADE, CEP_UNIDADE) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setString(1, unidade.getCdUnidade());
             ps.setString(2, unidade.getEndereco());
-            ps.setString(3, unidade.getCep());
-            ps.setString(4, unidade.getTelefone());
+            ps.setString(3, unidade.getTelefone());
+            ps.setString(4, unidade.getHorario());
+            ps.setString(5, unidade.getCep());
 
             if (ps.executeUpdate() > 0) {
                 return unidade;
@@ -76,7 +75,7 @@ public class UnidadeDAO {
     }
 
     public boolean delete(Long id) {
-        String sql = "DELETE FROM " + TABLE_NAME + " WHERE ID_UNIDADE = ?";
+        String sql = "DELETE FROM T_CUIDA_FACIL_UNIDADES WHERE ID_UNIDADE = ?";
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setLong(1, id);
             return ps.executeUpdate() > 0;
@@ -88,15 +87,15 @@ public class UnidadeDAO {
         return false;
     }
 
-    // UPDATE
     public UnidadeTO update(UnidadeTO unidade) {
-        String sql = "UPDATE " + TABLE_NAME + " SET CD_UNIDADE=?, END_UNIDADE=?, CEP_UNIDADE=?, TEL_UNIDADE=? WHERE ID_UNIDADE=?";
+        String sql = "UPDATE T_CUIDA_FACIL_UNIDADES SET CD_UNIDADE=?, END_UNIDADE=?, TEL_UNIDADE=?, HR_UNIDADE=?, CEP_UNIDADE=? WHERE ID_UNIDADE=?";
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setString(1, unidade.getCdUnidade());
             ps.setString(2, unidade.getEndereco());
-            ps.setString(3, unidade.getCep());
-            ps.setString(4, unidade.getTelefone());
-            ps.setLong(5, unidade.getId());
+            ps.setString(3, unidade.getTelefone());
+            ps.setString(4, unidade.getHorario());
+            ps.setString(5, unidade.getCep());
+            ps.setLong(6, unidade.getIdUnidade()); // Chave para o WHERE
 
             if (ps.executeUpdate() > 0) {
                 return unidade;

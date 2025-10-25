@@ -31,7 +31,7 @@ public class UnidadeResource {
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response findById(@PathParam("id") Long id) { // Padronizado para Long
+    public Response findById(@PathParam("id") Long id) {
         UnidadeTO resultado = unidadeBO.findById(id);
         Response.ResponseBuilder response = null;
         if (resultado != null) {
@@ -51,7 +51,7 @@ public class UnidadeResource {
         if (resultado != null){
             response = Response.created(null);  // 201 - CREATED
         } else {
-            response = Response.status(400);  // 400 - BAD REQUEST (falha na validação de negócio/DAO)
+            response = Response.status(400);  // 400 - BAD REQUEST
         }
         response.entity(resultado);
         return response.build();
@@ -72,13 +72,13 @@ public class UnidadeResource {
     @PUT
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response update(@Valid UnidadeTO unidade, @PathParam("id") Long id) { // Padronizado para Long
-        unidade.setId(id);
+    public Response update(@Valid UnidadeTO unidade, @PathParam("id") Long id) {
+        unidade.setIdUnidade(id);
+
         UnidadeTO resultado = unidadeBO.update(unidade);
         Response.ResponseBuilder response = null;
-
         if (resultado != null){
-            response = Response.created(null);  // 201 - CREATED (embora 200 OK ou 204 NO CONTENT seja mais comum para PUT)
+            response = Response.ok();  // 200 - OK (Comum para PUT)
         } else {
             response = Response.status(400);  // 400 - BAD REQUEST (ou 404 se o ID não existir)
         }

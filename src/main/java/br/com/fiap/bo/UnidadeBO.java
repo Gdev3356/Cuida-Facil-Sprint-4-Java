@@ -8,6 +8,7 @@ import java.util.List;
 public class UnidadeBO {
     private UnidadeDAO unidadeDAO;
 
+
     public List<UnidadeTO> findAll() {
         unidadeDAO = new UnidadeDAO();
         return unidadeDAO.findAll();
