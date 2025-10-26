@@ -1,5 +1,6 @@
 package br.com.fiap.dao;
 
+import br.com.fiap.exception.DAOException;
 import br.com.fiap.to.PacienteTO;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -12,6 +13,22 @@ public class PacienteDAO {
 
     private static final String TABLE_NAME = "T_CUIDA_FACIL_PACIENTES";
 
+    public PacienteTO findByCpf(String cpf) throws DAOException {
+        PacienteTO paciente = null;
+        String sql = "SELECT * FROM T_CUIDA_FACIL_PACIENTES WHERE CPF_PACIENTE = ?";
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
+            ps.setString(1, cpf);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                paciente = mapResultSetToTO(rs);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Erro ao buscar Paciente por CPF.", e);
+        } finally {
+            ConnectionFactory.closeConnection();
+        }
+        return paciente;
+    }
     private PacienteTO mapResultSetToTO(ResultSet rs) throws SQLException {
         PacienteTO paciente = new PacienteTO();
         paciente.setIdPaciente(rs.getLong("ID_PACIENTE"));

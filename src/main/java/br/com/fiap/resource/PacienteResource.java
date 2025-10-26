@@ -6,8 +6,13 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import br.com.fiap.exception.IdNotFoundException;
+import br.com.fiap.exception.BusinessRuleException;
+import br.com.fiap.exception.DAOException;
 
 import java.util.List;
+
+
 
 @Path("/pacientes")
 public class PacienteResource {
@@ -16,29 +21,52 @@ public class PacienteResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response findAll() {
-        List<PacienteTO> resultado = pacienteBO.findAll();
-        Response.ResponseBuilder response = (resultado != null && !resultado.isEmpty()) ? Response.ok() : Response.status(404);
-        response.entity(resultado);
-        return response.build();
+        try {
+            List<PacienteTO> resultado = pacienteBO.findAll();
+            Response.ResponseBuilder response = (resultado != null && !resultado.isEmpty()) ? Response.ok() : Response.status(404);
+            return response.entity(resultado).build();
+        } catch (DAOException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR) // 500
+                    .entity("Erro ao consultar dados: " + e.getMessage())
+                    .build();
+        }
     }
 
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response findById(@PathParam("id") Long id) {
-        PacienteTO resultado = pacienteBO.findById(id);
-        Response.ResponseBuilder response = (resultado != null) ? Response.ok() : Response.status(404);
-        response.entity(resultado);
-        return response.build();
+        try {
+            PacienteTO resultado = pacienteBO.findById(id);
+            return Response.ok(resultado).build(); // 200 OK
+        } catch (IdNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND) // 404
+                    .entity(e.getMessage())
+                    .build();
+        } catch (DAOException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR) // 500
+                    .entity("Erro ao buscar no banco de dados: " + e.getMessage())
+                    .build();
+        }
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response save(@Valid PacienteTO paciente) {
-        PacienteTO resultado = pacienteBO.save(paciente);
-        Response.ResponseBuilder response = (resultado != null) ? Response.created(null) : Response.status(400);
-        response.entity(resultado);
-        return response.build();
+        try {
+            PacienteTO resultado = pacienteBO.save(paciente);
+            return Response.created(null) // 201 Created
+                    .entity(resultado)
+                    .build();
+        } catch (BusinessRuleException e) {
+            return Response.status(Response.Status.BAD_REQUEST) // 400 Bad Request
+                    .entity(e.getMessage())
+                    .build();
+        } catch (DAOException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR) // 500
+                    .entity("Erro no banco de dados: " + e.getMessage())
+                    .build();
+        }
     }
 
     @DELETE
