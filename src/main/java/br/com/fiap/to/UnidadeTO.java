@@ -13,16 +13,16 @@ public class UnidadeTO {
 
     @NotBlank
     @Size(max = 255)
-    private String endereco; // Mapeia para END_UNIDADE
+    private String endereco;
 
     @Size(max = 20)
-    private String telefone; // Mapeia para TEL_UNIDADE
+    private String telefone;
 
     @Size(max = 100)
-    private String horario; // Mapeia para HR_UNIDADE
+    private String horario;
 
     @Size(max = 8)
-    private String cep; // Mapeia para CEP_UNIDADE
+    private String cep;
 
     public UnidadeTO() {
     }
