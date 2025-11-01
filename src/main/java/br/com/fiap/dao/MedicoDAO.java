@@ -16,6 +16,7 @@ public class MedicoDAO {
         medico.setIdMedico(rs.getLong("ID_MEDICO"));
         medico.setCrm(rs.getString("ID_CRM"));
         medico.setNome(rs.getString("NM_MEDICO"));
+        medico.setUrlImagemMedico(rs.getString("URL_IMAGEM_MEDICO"));
         return medico;
     }
 
@@ -53,10 +54,11 @@ public class MedicoDAO {
     }
 
     public MedicoTO save(MedicoTO medico) {
-        String sql = "INSERT INTO " + TABLE_NAME + " (ID_CRM, NM_MEDICO) VALUES (?, ?)";
+        String sql = "INSERT INTO " + TABLE_NAME + " (ID_CRM, NM_MEDICO, URL_IMAGEM_MEDICO)";
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setString(1, medico.getCrm());
             ps.setString(2, medico.getNome());
+            ps.setString(3, medico.getUrlImagemMedico());
 
             if (ps.executeUpdate() > 0) {
                 return medico;
@@ -83,11 +85,12 @@ public class MedicoDAO {
     }
 
     public MedicoTO update(MedicoTO medico) {
-        String sql = "UPDATE " + TABLE_NAME + " SET ID_CRM=?, NM_MEDICO=? WHERE ID_MEDICO=?";
+        String sql = "UPDATE " + TABLE_NAME + " SET ID_CRM=?, NM_MEDICO=?, URL_IMAGEM_MEDICO=? WHERE ID_MEDICO=?";;
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setString(1, medico.getCrm());
             ps.setString(2, medico.getNome());
-            ps.setLong(3, medico.getIdMedico());
+            ps.setString(3, medico.getUrlImagemMedico());
+            ps.setLong(4, medico.getIdMedico());
 
             if (ps.executeUpdate() > 0) {
                 return medico;

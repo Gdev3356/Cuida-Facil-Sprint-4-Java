@@ -24,16 +24,20 @@ public class UnidadeTO {
     @Size(max = 8)
     private String cep;
 
+    @Size(max = 500)
+    private String urlImagemUnidades;
+
     public UnidadeTO() {
     }
 
-    public UnidadeTO(Long idUnidade, String cdUnidade, String endereco, String telefone, String horario, String cep) {
+    public UnidadeTO(Long idUnidade, String cdUnidade, String endereco, String telefone, String horario, String cep, String urlImagemUnidades) {
         this.idUnidade = idUnidade;
         this.cdUnidade = cdUnidade;
         this.endereco = endereco;
         this.telefone = telefone;
         this.horario = horario;
         this.cep = cep;
+        this.urlImagemUnidades = urlImagemUnidades;
     }
 
     public Long getIdUnidade() { return idUnidade; }
@@ -53,4 +57,7 @@ public class UnidadeTO {
 
     public String getCep() { return cep; }
     public void setCep(String cep) { this.cep = cep; }
+
+    public String getUrlImagemUnidades() { return urlImagemUnidades; }
+    public void setUrlImagemUnidades(String urlImagemUnidades) { this.urlImagemUnidades = urlImagemUnidades; }
 }

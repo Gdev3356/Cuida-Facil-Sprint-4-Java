@@ -15,12 +15,16 @@ public class MedicoTO {
     @Size(max = 100)
     private String nome;
 
+    @Size(max = 500)
+    private String urlImagemMedico;
+
     public MedicoTO() {}
 
-    public MedicoTO(Long idMedico, String crm, String nome) {
+    public MedicoTO(Long idMedico, String crm, String nome, String urlImagemMedico) {
         this.idMedico = idMedico;
         this.crm = crm;
         this.nome = nome;
+        this.urlImagemMedico = urlImagemMedico;
     }
 
     public Long getIdMedico() { return idMedico; }
@@ -29,4 +33,6 @@ public class MedicoTO {
     public void setCrm(String crm) { this.crm = crm; }
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
+    public String getUrlImagemMedico() { return urlImagemMedico; }
+    public void setUrlImagemMedico(String urlImagemMedico) { this.urlImagemMedico = urlImagemMedico; }
 }

@@ -16,6 +16,7 @@ public class EspecialidadeDAO {
         especialidade.setIdEspecialidade(rs.getLong("ID_ESPECIALIDADE"));
         especialidade.setNome(rs.getString("NM_ESPECIALIDADE"));
         especialidade.setDescricao(rs.getString("DESCRICAO"));
+        especialidade.setUrlImagemEspecialidades(rs.getString("URL_IMAGEM_ESPECIALIDADES"));
         return especialidade;
     }
 
@@ -53,10 +54,11 @@ public class EspecialidadeDAO {
     }
 
     public EspecialidadeTO save(EspecialidadeTO especialidade) {
-        String sql = "INSERT INTO " + TABLE_NAME + " (NM_ESPECIALIDADE, DESCRICAO) VALUES (?, ?)";
+        String sql = "INSERT INTO " + TABLE_NAME + " (NM_ESPECIALIDADE, DESCRICAO, URL_IMAGEM_ESPECIALIDADES) VALUES (?, ?, ?)";
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setString(1, especialidade.getNome());
             ps.setString(2, especialidade.getDescricao());
+            ps.setString(3, especialidade.getUrlImagemEspecialidades());
 
             if (ps.executeUpdate() > 0) {
                 return especialidade;
@@ -83,11 +85,12 @@ public class EspecialidadeDAO {
     }
 
     public EspecialidadeTO update(EspecialidadeTO especialidade) {
-        String sql = "UPDATE " + TABLE_NAME + " SET NM_ESPECIALIDADE=?, DESCRICAO=? WHERE ID_ESPECIALIDADE=?";
+        String sql = "UPDATE " + TABLE_NAME + " SET NM_ESPECIALIDADE=?, DESCRICAO=?, URL_IMAGEM_ESPECIALIDADES=? WHERE ID_ESPECIALIDADE=?";
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setString(1, especialidade.getNome());
             ps.setString(2, especialidade.getDescricao());
-            ps.setLong(3, especialidade.getIdEspecialidade());
+            ps.setString(3, especialidade.getUrlImagemEspecialidades());
+            ps.setLong(4, especialidade.getIdEspecialidade());
 
             if (ps.executeUpdate() > 0) {
                 return especialidade;
