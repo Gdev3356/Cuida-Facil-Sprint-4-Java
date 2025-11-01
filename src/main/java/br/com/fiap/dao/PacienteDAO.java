@@ -15,7 +15,7 @@ public class PacienteDAO {
 
     public PacienteTO findByCpf(String cpf) throws DAOException {
         PacienteTO paciente = null;
-        String sql = "SELECT * FROM T_CUIDA_FACIL_PACIENTES WHERE CPF_PACIENTE = ?";
+        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE CPF_PACIENTE = ?";
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setString(1, cpf);
             ResultSet rs = ps.executeQuery();
@@ -29,6 +29,7 @@ public class PacienteDAO {
         }
         return paciente;
     }
+
     private PacienteTO mapResultSetToTO(ResultSet rs) throws SQLException {
         PacienteTO paciente = new PacienteTO();
         paciente.setIdPaciente(rs.getLong("ID_PACIENTE"));
@@ -109,7 +110,7 @@ public class PacienteDAO {
     }
 
     public PacienteTO update(PacienteTO paciente) {
-        String sql = "UPDATE " + TABLE_NAME + " SET CPF_PACIENTE=?, NM_PACIENTE=?, TEL_PACIENTE=?, EMAIL_PACIENTE=?, NASC_PACiente=?, CEP_PACIENTE=? WHERE ID_PACIENTE=?";
+        String sql = "UPDATE " + TABLE_NAME + " SET CPF_PACIENTE=?, NM_PACIENTE=?, TEL_PACIENTE=?, EMAIL_PACIENTE=?, NASC_PACIENTE=?, CEP_PACIENTE=? WHERE ID_PACIENTE=?";
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setString(1, paciente.getCpf());
             ps.setString(2, paciente.getNome());
