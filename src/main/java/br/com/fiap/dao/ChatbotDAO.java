@@ -4,7 +4,6 @@ import br.com.fiap.to.ChatbotTO;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +17,7 @@ public class ChatbotDAO {
         atendimento.setIdPaciente(rs.getLong("ID_PACIENTE"));
         atendimento.setHoraInteracao(rs.getTimestamp("HR_INTERACAO").toLocalDateTime());
         atendimento.setIntencaoUsuario(rs.getString("ID_INTENCAO_USUARIO"));
-        atendimento.setTextoResposta(rs.getString("TXT_RESPOSTA")); // CLOB é lido como String
+        atendimento.setTextoResposta(rs.getString("TXT_RESPOSTA"));
         return atendimento;
     }
 
@@ -56,12 +55,11 @@ public class ChatbotDAO {
     }
 
     public ChatbotTO save(ChatbotTO atendimento) {
-        // HR_INTERACAO usa DEFAULT SYSTIMESTAMP
         String sql = "INSERT INTO " + TABLE_NAME + " (ID_PACIENTE, ID_INTENCAO_USUARIO, TXT_RESPOSTA) VALUES (?, ?, ?)";
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setLong(1, atendimento.getIdPaciente());
             ps.setString(2, atendimento.getIntencaoUsuario());
-            ps.setString(3, atendimento.getTextoResposta()); // CLOB é setado como String
+            ps.setString(3, atendimento.getTextoResposta());
 
             if (ps.executeUpdate() > 0) {
                 return atendimento;
@@ -87,8 +85,6 @@ public class ChatbotDAO {
         return false;
     }
 
-    // O Update não deve atualizar a HR_INTERACAO, talvez? Depende da regra.
-    // Vamos assumir que pode atualizar tudo, exceto a hora da interação.
     public ChatbotTO update(ChatbotTO atendimento) {
         String sql = "UPDATE " + TABLE_NAME + " SET ID_PACIENTE=?, ID_INTENCAO_USUARIO=?, TXT_RESPOSTA=? WHERE ID_ATENDIMENTO=?";
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {

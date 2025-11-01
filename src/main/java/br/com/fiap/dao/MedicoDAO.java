@@ -29,7 +29,7 @@ public class MedicoDAO {
                 medicos.add(mapResultSetToTO(rs));
             }
         } catch (SQLException e) {
-            System.err.println("Erro na consulta (findAll Medico): " + e.getMessage());
+            System.out.println("Erro na consulta (findAll Medico): " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
@@ -46,7 +46,7 @@ public class MedicoDAO {
                 medico = mapResultSetToTO(rs);
             }
         } catch (SQLException e) {
-            System.err.println("Erro na consulta (findById Medico): " + e.getMessage());
+            System.out.println("Erro na consulta (findById Medico): " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
@@ -54,27 +54,17 @@ public class MedicoDAO {
     }
 
     public MedicoTO save(MedicoTO medico) {
-        // Corrigido: SQL completo com VALUES e SEQUENCE
-        String sql = "INSERT INTO " + TABLE_NAME + " (ID_MEDICO, ID_CRM, NM_MEDICO, URL_IMAGEM_MEDICO) " +
-                "VALUES (SEQ_MEDICO.NEXTVAL, ?, ?, ?)";
+        String sql = "INSERT INTO " + TABLE_NAME + " (ID_CRM, NM_MEDICO, URL_IMAGEM_MEDICO) VALUES (?, ?, ?)";
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setString(1, medico.getCrm());
             ps.setString(2, medico.getNome());
             ps.setString(3, medico.getUrlImagemMedico());
 
             if (ps.executeUpdate() > 0) {
-                // Buscar o ID gerado pela SEQUENCE
-                String sqlLastId = "SELECT SEQ_MEDICO.CURRVAL FROM DUAL";
-                try (PreparedStatement psId = ConnectionFactory.getConnection().prepareStatement(sqlLastId)) {
-                    ResultSet rs = psId.executeQuery();
-                    if (rs.next()) {
-                        medico.setIdMedico(rs.getLong(1));
-                    }
-                }
                 return medico;
             }
         } catch (SQLException e) {
-            System.err.println("Erro ao salvar (Medico): " + e.getMessage());
+            System.out.println("Erro ao salvar (Medico): " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
@@ -87,7 +77,7 @@ public class MedicoDAO {
             ps.setLong(1, id);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Erro ao excluir (Medico): " + e.getMessage());
+            System.out.println("Erro ao excluir (Medico): " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
@@ -106,7 +96,7 @@ public class MedicoDAO {
                 return medico;
             }
         } catch (SQLException e) {
-            System.err.println("Erro ao atualizar (Medico): " + e.getMessage());
+            System.out.println("Erro ao atualizar (Medico): " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
