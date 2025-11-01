@@ -80,7 +80,7 @@ public class UnidadeResource {
         if (resultado != null){
             response = Response.ok();  // 200 - OK (Comum para PUT)
         } else {
-            response = Response.status(400);  // 400 - BAD REQUEST (ou 404 se o ID não existir)
+            response = Response.status(400);  // 400 - BAD REQUEST (ou 404 se ID não existir)
         }
         response.entity(resultado);
         return response.build();
