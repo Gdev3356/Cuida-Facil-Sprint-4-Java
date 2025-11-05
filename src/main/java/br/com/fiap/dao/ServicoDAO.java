@@ -22,38 +22,50 @@ public class ServicoDAO {
     public List<ServicoTO> findAll() {
         List<ServicoTO> servicos = new ArrayList<>();
         String sql = "SELECT * FROM " + TABLE_NAME + " ORDER BY ID_SERVICO";
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
+
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
             while (rs.next()) {
                 servicos.add(mapResultSetToTO(rs));
             }
+
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findAll Servico): " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return servicos.isEmpty() ? null : servicos;
     }
 
     public ServicoTO findById(Long id) {
         ServicoTO servico = null;
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE ID_SERVICO = ?";
+
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setLong(1, id);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                servico = mapResultSetToTO(rs);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    servico = mapResultSetToTO(rs);
+                }
             }
+
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findById Servico): " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return servico;
     }
 
     public ServicoTO save(ServicoTO servico) {
-        String sql = "INSERT INTO " + TABLE_NAME + " (NM_SERVICO, ID_ESPECIALIDADE) VALUES (?, ?)";
+        String sql = "INSERT INTO " + TABLE_NAME +
+                     " (NM_SERVICO, ID_ESPECIALIDADE) " +
+                     "VALUES (?, ?)";
+
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setString(1, servico.getNome());
             ps.setLong(2, servico.getIdEspecialidade());
@@ -66,11 +78,13 @@ public class ServicoDAO {
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return null;
     }
 
     public boolean delete(Long id) {
         String sql = "DELETE FROM " + TABLE_NAME + " WHERE ID_SERVICO = ?";
+
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setLong(1, id);
             return ps.executeUpdate() > 0;
@@ -79,11 +93,15 @@ public class ServicoDAO {
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return false;
     }
 
     public ServicoTO update(ServicoTO servico) {
-        String sql = "UPDATE " + TABLE_NAME + " SET NM_SERVICO=?, ID_ESPECIALIDADE=? WHERE ID_SERVICO=?";
+        String sql = "UPDATE " + TABLE_NAME +
+                     " SET NM_SERVICO=?, ID_ESPECIALIDADE=? " +
+                     "WHERE ID_SERVICO=?";
+
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setString(1, servico.getNome());
             ps.setLong(2, servico.getIdEspecialidade());
@@ -97,6 +115,7 @@ public class ServicoDAO {
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return null;
     }
 }

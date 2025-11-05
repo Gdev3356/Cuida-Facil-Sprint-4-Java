@@ -23,38 +23,50 @@ public class MedicoDAO {
     public List<MedicoTO> findAll() {
         List<MedicoTO> medicos = new ArrayList<>();
         String sql = "SELECT * FROM " + TABLE_NAME + " ORDER BY ID_MEDICO";
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
+
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
             while (rs.next()) {
                 medicos.add(mapResultSetToTO(rs));
             }
+
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findAll Medico): " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return medicos.isEmpty() ? null : medicos;
     }
 
     public MedicoTO findById(Long id) {
         MedicoTO medico = null;
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE ID_MEDICO = ?";
+
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setLong(1, id);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                medico = mapResultSetToTO(rs);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    medico = mapResultSetToTO(rs);
+                }
             }
+
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findById Medico): " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return medico;
     }
 
     public MedicoTO save(MedicoTO medico) {
-        String sql = "INSERT INTO " + TABLE_NAME + " (ID_CRM, NM_MEDICO, URL_IMAGEM_MEDICO) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO " + TABLE_NAME +
+                     " (ID_CRM, NM_MEDICO, URL_IMAGEM_MEDICO) " +
+                     "VALUES (?, ?, ?)";
+
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setString(1, medico.getCrm());
             ps.setString(2, medico.getNome());
@@ -68,11 +80,13 @@ public class MedicoDAO {
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return null;
     }
 
     public boolean delete(Long id) {
         String sql = "DELETE FROM " + TABLE_NAME + " WHERE ID_MEDICO = ?";
+
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setLong(1, id);
             return ps.executeUpdate() > 0;
@@ -81,11 +95,15 @@ public class MedicoDAO {
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return false;
     }
 
     public MedicoTO update(MedicoTO medico) {
-        String sql = "UPDATE " + TABLE_NAME + " SET ID_CRM=?, NM_MEDICO=?, URL_IMAGEM_MEDICO=? WHERE ID_MEDICO=?";
+        String sql = "UPDATE " + TABLE_NAME +
+                     " SET ID_CRM=?, NM_MEDICO=?, URL_IMAGEM_MEDICO=? " +
+                     "WHERE ID_MEDICO=?";
+
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setString(1, medico.getCrm());
             ps.setString(2, medico.getNome());
@@ -100,6 +118,7 @@ public class MedicoDAO {
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return null;
     }
 }

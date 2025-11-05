@@ -26,38 +26,50 @@ public class UnidadeDAO {
     public List<UnidadeTO> findAll() {
         List<UnidadeTO> unidades = new ArrayList<>();
         String sql = "SELECT * FROM " + TABLE_NAME + " ORDER BY ID_UNIDADE";
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
+
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
             while (rs.next()) {
                 unidades.add(mapResultSetToTO(rs));
             }
+
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findAll Unidade): " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return unidades.isEmpty() ? null : unidades;
     }
 
     public UnidadeTO findById(Long id) {
         UnidadeTO unidade = null;
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE ID_UNIDADE = ?";
+
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setLong(1, id);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                unidade = mapResultSetToTO(rs);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    unidade = mapResultSetToTO(rs);
+                }
             }
+
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findById Unidade): " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return unidade;
     }
 
     public UnidadeTO save(UnidadeTO unidade) {
-        String sql = "INSERT INTO " + TABLE_NAME + " (CD_UNIDADE, END_UNIDADE, TEL_UNIDADE, HR_UNIDADE, CEP_UNIDADE, URL_IMAGEM_UNIDADE) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO " + TABLE_NAME +
+                     " (CD_UNIDADE, END_UNIDADE, TEL_UNIDADE, HR_UNIDADE, CEP_UNIDADE, URL_IMAGEM_UNIDADE) " +
+                     "VALUES (?, ?, ?, ?, ?, ?)";
+
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setString(1, unidade.getCdUnidade());
             ps.setString(2, unidade.getEndereco());
@@ -74,11 +86,13 @@ public class UnidadeDAO {
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return null;
     }
 
     public boolean delete(Long id) {
         String sql = "DELETE FROM " + TABLE_NAME + " WHERE ID_UNIDADE = ?";
+
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setLong(1, id);
             return ps.executeUpdate() > 0;
@@ -87,11 +101,15 @@ public class UnidadeDAO {
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return false;
     }
 
     public UnidadeTO update(UnidadeTO unidade) {
-        String sql = "UPDATE " + TABLE_NAME + " SET CD_UNIDADE=?, END_UNIDADE=?, TEL_UNIDADE=?, HR_UNIDADE=?, CEP_UNIDADE=?, URL_IMAGEM_UNIDADE=? WHERE ID_UNIDADE=?";
+        String sql = "UPDATE " + TABLE_NAME +
+                     " SET CD_UNIDADE=?, END_UNIDADE=?, TEL_UNIDADE=?, HR_UNIDADE=?, CEP_UNIDADE=?, URL_IMAGEM_UNIDADE=? " +
+                     "WHERE ID_UNIDADE=?";
+
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setString(1, unidade.getCdUnidade());
             ps.setString(2, unidade.getEndereco());
@@ -109,6 +127,7 @@ public class UnidadeDAO {
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return null;
     }
 }

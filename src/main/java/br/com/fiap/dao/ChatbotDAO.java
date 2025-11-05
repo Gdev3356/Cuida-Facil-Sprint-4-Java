@@ -25,50 +25,61 @@ public class ChatbotDAO {
     public List<ChatbotTO> findAll() {
         List<ChatbotTO> atendimentos = new ArrayList<>();
         String sql = "SELECT * FROM " + TABLE_NAME + " ORDER BY ID_ATENDIMENTO DESC";
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
+
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
             while (rs.next()) {
                 atendimentos.add(mapResultSetToTO(rs));
             }
+
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findAll Chatbot): " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return atendimentos.isEmpty() ? null : atendimentos;
     }
 
     public ChatbotTO findById(Long id) {
         ChatbotTO atendimento = null;
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE ID_ATENDIMENTO = ?";
+
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setLong(1, id);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                atendimento = mapResultSetToTO(rs);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    atendimento = mapResultSetToTO(rs);
+                }
             }
+
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findById Chatbot): " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return atendimento;
     }
 
     public ChatbotTO save(ChatbotTO atendimento) {
         String sqlId = "SELECT NVL(MAX(ID_ATENDIMENTO), 0) + 1 FROM " + TABLE_NAME;
         String sqlInsert = "INSERT INTO " + TABLE_NAME +
-                " (ID_ATENDIMENTO, ID_PACIENTE, HR_INTERACAO, ID_INTENCAO_USUARIO, TXT_RESPOSTA) " +
-                "VALUES (?, ?, ?, ?, ?)";
+                           " (ID_ATENDIMENTO, ID_PACIENTE, HR_INTERACAO, ID_INTENCAO_USUARIO, TXT_RESPOSTA) " +
+                           "VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement psId = ConnectionFactory.getConnection().prepareStatement(sqlId);
              PreparedStatement psInsert = ConnectionFactory.getConnection().prepareStatement(sqlInsert)) {
 
-            ResultSet rs = psId.executeQuery();
             Long novoId = 1L;
-            if (rs.next()) {
-                novoId = rs.getLong(1);
+            try (ResultSet rs = psId.executeQuery()) {
+                if (rs.next()) {
+                    novoId = rs.getLong(1);
+                }
             }
+
             atendimento.setIdAtendimento(novoId);
 
             psInsert.setLong(1, novoId);
@@ -85,11 +96,13 @@ public class ChatbotDAO {
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return null;
     }
 
     public boolean delete(Long id) {
         String sql = "DELETE FROM " + TABLE_NAME + " WHERE ID_ATENDIMENTO = ?";
+
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setLong(1, id);
             return ps.executeUpdate() > 0;
@@ -98,11 +111,15 @@ public class ChatbotDAO {
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return false;
     }
 
     public ChatbotTO update(ChatbotTO atendimento) {
-        String sql = "UPDATE " + TABLE_NAME + " SET ID_PACIENTE=?, ID_INTENCAO_USUARIO=?, TXT_RESPOSTA=? WHERE ID_ATENDIMENTO=?";
+        String sql = "UPDATE " + TABLE_NAME +
+                     " SET ID_PACIENTE=?, ID_INTENCAO_USUARIO=?, TXT_RESPOSTA=? " +
+                     "WHERE ID_ATENDIMENTO=?";
+
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setLong(1, atendimento.getIdPaciente());
             ps.setString(2, atendimento.getIntencaoUsuario());
@@ -117,6 +134,7 @@ public class ChatbotDAO {
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return null;
     }
 }

@@ -78,11 +78,13 @@ public class ConsultaDAO {
             ORDER BY C.DT_CONSULTA DESC
         """;
 
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
             while (rs.next()) {
                 consultas.add(mapResultSetToDTO(rs));
             }
+
         } catch (SQLException e) {
             System.out.println("Erro ao buscar consultas detalhadas: " + e.getMessage());
         } finally {
@@ -122,10 +124,13 @@ public class ConsultaDAO {
 
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setLong(1, id);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                consulta = mapResultSetToDTO(rs);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    consulta = mapResultSetToDTO(rs);
+                }
             }
+
         } catch (SQLException e) {
             System.out.println("Erro ao buscar consulta detalhada por ID: " + e.getMessage());
         } finally {
@@ -138,33 +143,42 @@ public class ConsultaDAO {
     public List<ConsultaTO> findAll() {
         List<ConsultaTO> consultas = new ArrayList<>();
         String sql = "SELECT * FROM " + TABLE_NAME + " ORDER BY DT_CONSULTA DESC";
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
+
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
             while (rs.next()) {
                 consultas.add(mapResultSetToTO(rs));
             }
+
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findAll Consulta): " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return consultas.isEmpty() ? null : consultas;
     }
 
     public ConsultaTO findById(Long id) {
         ConsultaTO consulta = null;
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE ID_CONSULTA = ?";
+
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setLong(1, id);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                consulta = mapResultSetToTO(rs);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    consulta = mapResultSetToTO(rs);
+                }
             }
+
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findById Consulta): " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return consulta;
     }
 
@@ -182,18 +196,20 @@ public class ConsultaDAO {
         System.out.println("Tipo: " + consulta.getTipoAtendimento());
         System.out.println("ID Paciente: " + consulta.getIdPaciente());
         System.out.println("ID Medico: " + consulta.getIdMedico());
-        System.out.println("ID Unidade: " + consulta.getIdUnidade()); // ← CRÍTICO
+        System.out.println("ID Unidade: " + consulta.getIdUnidade());
         System.out.println("ID Especialidade: " + consulta.getIdEspecialidade());
         System.out.println("==================================");
 
         try (PreparedStatement psId = ConnectionFactory.getConnection().prepareStatement(sqlId);
              PreparedStatement psInsert = ConnectionFactory.getConnection().prepareStatement(sqlInsert)) {
 
-            ResultSet rs = psId.executeQuery();
             Long novoId = 1L;
-            if (rs.next()) {
-                novoId = rs.getLong(1);
+            try (ResultSet rs = psId.executeQuery()) {
+                if (rs.next()) {
+                    novoId = rs.getLong(1);
+                }
             }
+
             consulta.setIdConsulta(novoId);
 
             psInsert.setLong(1, novoId);
@@ -203,7 +219,7 @@ public class ConsultaDAO {
             psInsert.setString(5, consulta.getTipoAtendimento());
             psInsert.setLong(6, consulta.getIdPaciente());
             psInsert.setLong(7, consulta.getIdMedico());
-            psInsert.setLong(8, consulta.getIdUnidade()); // ← VERIFIQUE SE ESTÁ NULL
+            psInsert.setLong(8, consulta.getIdUnidade());
             psInsert.setLong(9, consulta.getIdEspecialidade());
 
             System.out.println("Executando INSERT com ID_UNIDADE = " + consulta.getIdUnidade());
@@ -224,11 +240,13 @@ public class ConsultaDAO {
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return null;
     }
 
     public boolean delete(Long id) {
         String sql = "DELETE FROM " + TABLE_NAME + " WHERE ID_CONSULTA = ?";
+
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setLong(1, id);
             return ps.executeUpdate() > 0;
@@ -237,6 +255,7 @@ public class ConsultaDAO {
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return false;
     }
 
@@ -265,6 +284,7 @@ public class ConsultaDAO {
         } finally {
             ConnectionFactory.closeConnection();
         }
+
         return null;
     }
 }
