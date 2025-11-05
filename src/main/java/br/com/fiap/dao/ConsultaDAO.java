@@ -4,6 +4,7 @@ import br.com.fiap.to.ConsultaTO;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +62,9 @@ public class ConsultaDAO {
 
     public ConsultaTO save(ConsultaTO consulta) {
         String sql = "INSERT INTO " + TABLE_NAME + " (CD_PROTOCOLO, DT_CONSULTA, FL_STATUS, TP_ATENDIMENTO, ID_PACIENTE, ID_MEDICO, ID_UNIDADE, ID_ESPECIALIDADE) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
+
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql, new String[] { "ID_CONSULTA" })) {
+
             ps.setString(1, consulta.getProtocolo());
             ps.setTimestamp(2, Timestamp.valueOf(consulta.getDataConsulta()));
             ps.setString(3, consulta.getStatus());
@@ -72,6 +75,12 @@ public class ConsultaDAO {
             ps.setLong(8, consulta.getIdEspecialidade());
 
             if (ps.executeUpdate() > 0) {
+
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        consulta.setIdConsulta(rs.getLong(1));
+                    }
+                }
                 return consulta;
             }
         } catch (SQLException e) {

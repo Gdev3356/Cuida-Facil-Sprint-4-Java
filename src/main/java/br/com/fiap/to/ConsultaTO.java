@@ -7,7 +7,6 @@ public class ConsultaTO {
 
     private Long idConsulta;
 
-    @NotBlank
     @Size(max = 16)
     private String protocolo;
 
