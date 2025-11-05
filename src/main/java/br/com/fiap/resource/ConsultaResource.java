@@ -1,14 +1,12 @@
 package br.com.fiap.resource;
 
 import br.com.fiap.bo.ConsultaBO;
-import br.com.fiap.exception.BusinessRuleException;
-import br.com.fiap.exception.DAOException;
 import br.com.fiap.to.ConsultaTO;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import java.util.Map;
+
 import java.util.List;
 
 @Path("/consultas")
@@ -37,31 +35,10 @@ public class ConsultaResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response save(@Valid ConsultaTO consulta) {
-        try {
-            ConsultaTO resultado = consultaBO.save(consulta);
-
-            return Response.created(null).entity(resultado).build();
-
-        } catch (BusinessRuleException e) {
-            return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity(Map.of("message", e.getMessage()))
-                    .build();
-
-        } catch (DAOException e) {
-            System.out.println("Erro de DAO ao salvar consulta: " + e.getMessage());
-            return Response
-                    .status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity(Map.of("message", "Erro interno ao salvar consulta no banco de dados."))
-                    .build();
-
-        } catch (Exception e) {
-            System.out.println("Erro desconhecido ao salvar consulta: " + e.getMessage());
-            return Response
-                    .status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity(Map.of("message", "Erro inesperado do servidor."))
-                    .build();
-        }
+        ConsultaTO resultado = consultaBO.save(consulta);
+        Response.ResponseBuilder response = (resultado != null) ? Response.created(null) : Response.status(400);
+        response.entity(resultado);
+        return response.build();
     }
 
     @DELETE
