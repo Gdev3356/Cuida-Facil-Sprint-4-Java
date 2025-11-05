@@ -29,8 +29,6 @@ public class ServicoDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findAll Servico): " + e.getMessage());
-        } finally {
-            ConnectionFactory.closeConnection();
         }
         return servicos.isEmpty() ? null : servicos;
     }
@@ -46,8 +44,6 @@ public class ServicoDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findById Servico): " + e.getMessage());
-        } finally {
-            ConnectionFactory.closeConnection();
         }
         return servico;
     }
@@ -63,8 +59,6 @@ public class ServicoDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro ao salvar (Servico): " + e.getMessage());
-        } finally {
-            ConnectionFactory.closeConnection();
         }
         return null;
     }
@@ -76,8 +70,6 @@ public class ServicoDAO {
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Erro ao excluir (Servico): " + e.getMessage());
-        } finally {
-            ConnectionFactory.closeConnection();
         }
         return false;
     }
@@ -94,8 +86,6 @@ public class ServicoDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro ao atualizar (Servico): " + e.getMessage());
-        } finally {
-            ConnectionFactory.closeConnection();
         }
         return null;
     }

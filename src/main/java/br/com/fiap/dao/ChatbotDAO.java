@@ -32,8 +32,6 @@ public class ChatbotDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findAll Chatbot): " + e.getMessage());
-        } finally {
-            ConnectionFactory.closeConnection();
         }
         return atendimentos.isEmpty() ? null : atendimentos;
     }
@@ -49,8 +47,6 @@ public class ChatbotDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findById Chatbot): " + e.getMessage());
-        } finally {
-            ConnectionFactory.closeConnection();
         }
         return atendimento;
     }
@@ -82,8 +78,6 @@ public class ChatbotDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro ao salvar (Chatbot): " + e.getMessage());
-        } finally {
-            ConnectionFactory.closeConnection();
         }
         return null;
     }
@@ -95,8 +89,6 @@ public class ChatbotDAO {
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Erro ao excluir (Chatbot): " + e.getMessage());
-        } finally {
-            ConnectionFactory.closeConnection();
         }
         return false;
     }
@@ -114,8 +106,6 @@ public class ChatbotDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro ao atualizar (Chatbot): " + e.getMessage());
-        } finally {
-            ConnectionFactory.closeConnection();
         }
         return null;
     }
