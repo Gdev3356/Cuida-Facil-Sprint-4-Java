@@ -85,7 +85,10 @@ public class ConsultaDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro ao buscar consultas detalhadas: " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
+
         return consultas.isEmpty() ? null : consultas;
     }
 
@@ -125,7 +128,10 @@ public class ConsultaDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro ao buscar consulta detalhada por ID: " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
+
         return consulta;
     }
 
@@ -139,6 +145,8 @@ public class ConsultaDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findAll Consulta): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return consultas.isEmpty() ? null : consultas;
     }
@@ -154,6 +162,8 @@ public class ConsultaDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findById Consulta): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return consulta;
     }
@@ -211,6 +221,8 @@ public class ConsultaDAO {
             System.err.println("SQL State: " + e.getSQLState());
             System.err.println("Error Code: " + e.getErrorCode());
             e.printStackTrace();
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return null;
     }
@@ -222,6 +234,8 @@ public class ConsultaDAO {
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Erro ao excluir (Consulta): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return false;
     }
@@ -248,6 +262,8 @@ public class ConsultaDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro ao atualizar (Consulta): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return null;
     }

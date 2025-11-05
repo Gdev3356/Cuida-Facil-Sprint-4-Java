@@ -24,6 +24,8 @@ public class PacienteDAO {
             }
         } catch (SQLException e) {
             throw new DAOException("Erro ao buscar Paciente por CPF.", e);
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return paciente;
     }
@@ -50,6 +52,8 @@ public class PacienteDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findAll Paciente): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return pacientes.isEmpty() ? null : pacientes;
     }
@@ -65,6 +69,8 @@ public class PacienteDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findById Paciente): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return paciente;
     }
@@ -84,6 +90,8 @@ public class PacienteDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro ao salvar (Paciente): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return null;
     }
@@ -95,6 +103,8 @@ public class PacienteDAO {
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Erro ao excluir (Paciente): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return false;
     }
@@ -115,6 +125,8 @@ public class PacienteDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro ao atualizar (Paciente): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return null;
     }

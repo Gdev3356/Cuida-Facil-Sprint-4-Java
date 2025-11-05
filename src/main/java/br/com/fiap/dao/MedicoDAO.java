@@ -30,6 +30,8 @@ public class MedicoDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findAll Medico): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return medicos.isEmpty() ? null : medicos;
     }
@@ -45,6 +47,8 @@ public class MedicoDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findById Medico): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return medico;
     }
@@ -61,6 +65,8 @@ public class MedicoDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro ao salvar (Medico): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return null;
     }
@@ -72,6 +78,8 @@ public class MedicoDAO {
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Erro ao excluir (Medico): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return false;
     }
@@ -89,6 +97,8 @@ public class MedicoDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro ao atualizar (Medico): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return null;
     }

@@ -30,6 +30,8 @@ public class EspecialidadeDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findAll Especialidade): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return especialidades.isEmpty() ? null : especialidades;
     }
@@ -45,6 +47,8 @@ public class EspecialidadeDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findById Especialidade): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return especialidade;
     }
@@ -61,6 +65,8 @@ public class EspecialidadeDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro ao salvar (Especialidade): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return null;
     }
@@ -72,6 +78,8 @@ public class EspecialidadeDAO {
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Erro ao excluir (Especialidade): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return false;
     }
@@ -89,6 +97,8 @@ public class EspecialidadeDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro ao atualizar (Especialidade): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return null;
     }

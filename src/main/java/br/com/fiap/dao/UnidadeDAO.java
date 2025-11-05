@@ -33,6 +33,8 @@ public class UnidadeDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findAll Unidade): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return unidades.isEmpty() ? null : unidades;
     }
@@ -48,6 +50,8 @@ public class UnidadeDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findById Unidade): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return unidade;
     }
@@ -67,6 +71,8 @@ public class UnidadeDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro ao salvar (Unidade): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return null;
     }
@@ -78,6 +84,8 @@ public class UnidadeDAO {
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Erro ao excluir (Unidade): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return false;
     }
@@ -98,6 +106,8 @@ public class UnidadeDAO {
             }
         } catch (SQLException e) {
             System.out.println("Erro ao atualizar (Unidade): " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
         }
         return null;
     }
