@@ -41,12 +41,38 @@ public class ConsultaResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response save(@Valid ConsultaTO consulta) {
-        ConsultaTO resultado = consultaBO.save(consulta);
-        Response.ResponseBuilder response = (resultado != null)
-                ? Response.created(null)
-                : Response.status(400);
-        response.entity(resultado);
-        return response.build();
+        // LOGS PARA DEBUG
+        System.out.println("========= DEBUG CONSULTA =========");
+        System.out.println("Data: " + consulta.getDataConsulta());
+        System.out.println("Status: " + consulta.getStatus());
+        System.out.println("Tipo: " + consulta.getTipoAtendimento());
+        System.out.println("ID Paciente: " + consulta.getIdPaciente());
+        System.out.println("ID Medico: " + consulta.getIdMedico());
+        System.out.println("ID Unidade: " + consulta.getIdUnidade()); // ← VERIFIQUE ESTE
+        System.out.println("ID Especialidade: " + consulta.getIdEspecialidade());
+        System.out.println("==================================");
+
+        // Validação adicional
+        if (consulta.getIdUnidade() == null) {
+            return Response.status(400)
+                    .entity("{\"error\": \"ID da Unidade é obrigatório\"}")
+                    .build();
+        }
+
+        try {
+            ConsultaTO resultado = consultaBO.save(consulta);
+            Response.ResponseBuilder response = (resultado != null)
+                    ? Response.created(null)
+                    : Response.status(400);
+            response.entity(resultado);
+            return response.build();
+        } catch (Exception e) {
+            System.err.println("Erro ao salvar consulta: " + e.getMessage());
+            e.printStackTrace();
+            return Response.status(500)
+                    .entity("{\"error\": \"" + e.getMessage() + "\"}")
+                    .build();
+        }
     }
 
     @DELETE

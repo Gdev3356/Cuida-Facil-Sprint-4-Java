@@ -171,9 +171,20 @@ public class ConsultaDAO {
     public ConsultaTO save(ConsultaTO consulta) {
         String sqlId = "SELECT NVL(MAX(ID_CONSULTA), 0) + 1 FROM " + TABLE_NAME;
         String sqlInsert = "INSERT INTO " + TABLE_NAME +
-                " (ID_CONSULTA, CD_PROTOCOLO, DT_CONSULTA, FL_STATUS, TP_ATENDIMENTO, " +
-                "ID_PACIENTE, ID_MEDICO, ID_UNIDADE, ID_ESPECIALIDADE) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                           " (ID_CONSULTA, CD_PROTOCOLO, DT_CONSULTA, FL_STATUS, TP_ATENDIMENTO, " +
+                           "ID_PACIENTE, ID_MEDICO, ID_UNIDADE, ID_ESPECIALIDADE) " +
+                           "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        System.out.println("========= DAO SAVE DEBUG =========");
+        System.out.println("Protocolo: " + consulta.getProtocolo());
+        System.out.println("Data: " + consulta.getDataConsulta());
+        System.out.println("Status: " + consulta.getStatus());
+        System.out.println("Tipo: " + consulta.getTipoAtendimento());
+        System.out.println("ID Paciente: " + consulta.getIdPaciente());
+        System.out.println("ID Medico: " + consulta.getIdMedico());
+        System.out.println("ID Unidade: " + consulta.getIdUnidade()); // ← CRÍTICO
+        System.out.println("ID Especialidade: " + consulta.getIdEspecialidade());
+        System.out.println("==================================");
 
         try (PreparedStatement psId = ConnectionFactory.getConnection().prepareStatement(sqlId);
              PreparedStatement psInsert = ConnectionFactory.getConnection().prepareStatement(sqlInsert)) {
@@ -192,14 +203,24 @@ public class ConsultaDAO {
             psInsert.setString(5, consulta.getTipoAtendimento());
             psInsert.setLong(6, consulta.getIdPaciente());
             psInsert.setLong(7, consulta.getIdMedico());
-            psInsert.setLong(8, consulta.getIdUnidade());
+            psInsert.setLong(8, consulta.getIdUnidade()); // ← VERIFIQUE SE ESTÁ NULL
             psInsert.setLong(9, consulta.getIdEspecialidade());
 
-            if (psInsert.executeUpdate() > 0) {
+            System.out.println("Executando INSERT com ID_UNIDADE = " + consulta.getIdUnidade());
+
+            int rowsAffected = psInsert.executeUpdate();
+
+            System.out.println("Linhas afetadas: " + rowsAffected);
+
+            if (rowsAffected > 0) {
+                System.out.println("Consulta salva com sucesso! ID: " + novoId);
                 return consulta;
             }
         } catch (SQLException e) {
-            System.out.println("Erro ao salvar (Consulta): " + e.getMessage());
+            System.err.println("ERRO SQL ao salvar consulta: " + e.getMessage());
+            System.err.println("SQL State: " + e.getSQLState());
+            System.err.println("Error Code: " + e.getErrorCode());
+            e.printStackTrace();
         } finally {
             ConnectionFactory.closeConnection();
         }
@@ -221,9 +242,9 @@ public class ConsultaDAO {
 
     public ConsultaTO update(ConsultaTO consulta) {
         String sql = "UPDATE " + TABLE_NAME +
-                " SET CD_PROTOCOLO=?, DT_CONSULTA=?, FL_STATUS=?, TP_ATENDIMENTO=?, " +
-                "ID_PACIENTE=?, ID_MEDICO=?, ID_UNIDADE=?, ID_ESPECIALIDADE=? " +
-                "WHERE ID_CONSULTA=?";
+                     " SET CD_PROTOCOLO=?, DT_CONSULTA=?, FL_STATUS=?, TP_ATENDIMENTO=?, " +
+                     "ID_PACIENTE=?, ID_MEDICO=?, ID_UNIDADE=?, ID_ESPECIALIDADE=? " +
+                     "WHERE ID_CONSULTA=?";
 
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setString(1, consulta.getProtocolo());
