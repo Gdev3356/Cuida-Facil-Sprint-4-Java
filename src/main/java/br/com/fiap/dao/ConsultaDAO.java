@@ -1,5 +1,6 @@
 package br.com.fiap.dao;
 
+import br.com.fiap.to.ConsultaDetalhadaTO;
 import br.com.fiap.to.ConsultaTO;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,6 +24,114 @@ public class ConsultaDAO {
         consulta.setIdMedico(rs.getLong("ID_MEDICO"));
         consulta.setIdUnidade(rs.getLong("ID_UNIDADE"));
         consulta.setIdEspecialidade(rs.getLong("ID_ESPECIALIDADE"));
+        return consulta;
+    }
+
+    private ConsultaDetalhadaTO mapResultSetToDTO(ResultSet rs) throws SQLException {
+        ConsultaDetalhadaTO dto = new ConsultaDetalhadaTO();
+        dto.setIdConsulta(rs.getLong("ID_CONSULTA"));
+        dto.setProtocolo(rs.getString("CD_PROTOCOLO"));
+        dto.setDataConsulta(rs.getTimestamp("DT_CONSULTA").toLocalDateTime());
+        dto.setStatus(rs.getString("FL_STATUS"));
+        dto.setTipoAtendimento(rs.getString("TP_ATENDIMENTO"));
+
+        dto.setIdPaciente(rs.getLong("ID_PACIENTE"));
+        dto.setIdMedico(rs.getLong("ID_MEDICO"));
+        dto.setIdUnidade(rs.getLong("ID_UNIDADE"));
+        dto.setIdEspecialidade(rs.getLong("ID_ESPECIALIDADE"));
+
+        dto.setNomePaciente(rs.getString("NOME_PACIENTE"));
+        dto.setNomeMedico(rs.getString("NOME_MEDICO"));
+        dto.setCrmMedico(rs.getString("CRM_MEDICO"));
+        dto.setNomeUnidade(rs.getString("NOME_UNIDADE"));
+        dto.setEnderecoUnidade(rs.getString("ENDERECO_UNIDADE"));
+        dto.setNomeEspecialidade(rs.getString("NOME_ESPECIALIDADE"));
+
+        return dto;
+    }
+
+    public List<ConsultaDetalhadaTO> findAllDetalhadas() {
+        List<ConsultaDetalhadaTO> consultas = new ArrayList<>();
+
+        String sql = """
+            SELECT 
+                C.ID_CONSULTA,
+                C.CD_PROTOCOLO,
+                C.DT_CONSULTA,
+                C.FL_STATUS,
+                C.TP_ATENDIMENTO,
+                C.ID_PACIENTE,
+                P.NM_PACIENTE AS NOME_PACIENTE,
+                C.ID_MEDICO,
+                M.NM_MEDICO AS NOME_MEDICO,
+                M.ID_CRM AS CRM_MEDICO,
+                C.ID_UNIDADE,
+                U.CD_UNIDADE AS NOME_UNIDADE,
+                U.END_UNIDADE AS ENDERECO_UNIDADE,
+                C.ID_ESPECIALIDADE,
+                E.NM_ESPECIALIDADE AS NOME_ESPECIALIDADE
+            FROM T_CUIDA_FACIL_CONSULTAS C
+            INNER JOIN T_CUIDA_FACIL_PACIENTES P ON C.ID_PACIENTE = P.ID_PACIENTE
+            INNER JOIN T_CUIDA_FACIL_MEDICOS M ON C.ID_MEDICO = M.ID_MEDICO
+            INNER JOIN T_CUIDA_FACIL_UNIDADES U ON C.ID_UNIDADE = U.ID_UNIDADE
+            INNER JOIN T_CUIDA_FACIL_ESPECIALIDADES E ON C.ID_ESPECIALIDADE = E.ID_ESPECIALIDADE
+            ORDER BY C.DT_CONSULTA DESC
+        """;
+
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                consultas.add(mapResultSetToDTO(rs));
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro ao buscar consultas detalhadas: " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
+        }
+
+        return consultas.isEmpty() ? null : consultas;
+    }
+
+    public ConsultaDetalhadaTO findByIdDetalhada(Long id) {
+        ConsultaDetalhadaTO consulta = null;
+
+        String sql = """
+            SELECT 
+                C.ID_CONSULTA,
+                C.CD_PROTOCOLO,
+                C.DT_CONSULTA,
+                C.FL_STATUS,
+                C.TP_ATENDIMENTO,
+                C.ID_PACIENTE,
+                P.NM_PACIENTE AS NOME_PACIENTE,
+                C.ID_MEDICO,
+                M.NM_MEDICO AS NOME_MEDICO,
+                M.ID_CRM AS CRM_MEDICO,
+                C.ID_UNIDADE,
+                U.CD_UNIDADE AS NOME_UNIDADE,
+                U.END_UNIDADE AS ENDERECO_UNIDADE,
+                C.ID_ESPECIALIDADE,
+                E.NM_ESPECIALIDADE AS NOME_ESPECIALIDADE
+            FROM T_CUIDA_FACIL_CONSULTAS C
+            INNER JOIN T_CUIDA_FACIL_PACIENTES P ON C.ID_PACIENTE = P.ID_PACIENTE
+            INNER JOIN T_CUIDA_FACIL_MEDICOS M ON C.ID_MEDICO = M.ID_MEDICO
+            INNER JOIN T_CUIDA_FACIL_UNIDADES U ON C.ID_UNIDADE = U.ID_UNIDADE
+            INNER JOIN T_CUIDA_FACIL_ESPECIALIDADES E ON C.ID_ESPECIALIDADE = E.ID_ESPECIALIDADE
+            WHERE C.ID_CONSULTA = ?
+        """;
+
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
+            ps.setLong(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                consulta = mapResultSetToDTO(rs);
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro ao buscar consulta detalhada por ID: " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
+        }
+
         return consulta;
     }
 
