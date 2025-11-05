@@ -2,6 +2,7 @@ package br.com.fiap.bo;
 
 import br.com.fiap.dao.ChatbotDAO;
 import br.com.fiap.to.ChatbotTO;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class ChatbotBO {
@@ -19,6 +20,11 @@ public class ChatbotBO {
 
     public ChatbotTO save(ChatbotTO atendimento) {
         chatbotDAO = new ChatbotDAO();
+        
+        if (atendimento.getHoraInteracao() == null) {
+            atendimento.setHoraInteracao(LocalDateTime.now());
+        }
+
         return chatbotDAO.save(atendimento);
     }
 

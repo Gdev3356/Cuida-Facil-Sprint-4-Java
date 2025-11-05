@@ -4,6 +4,7 @@ import br.com.fiap.to.ChatbotTO;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,13 +56,28 @@ public class ChatbotDAO {
     }
 
     public ChatbotTO save(ChatbotTO atendimento) {
-        String sql = "INSERT INTO " + TABLE_NAME + " (ID_PACIENTE, ID_INTENCAO_USUARIO, TXT_RESPOSTA) VALUES (?, ?, ?)";
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
-            ps.setLong(1, atendimento.getIdPaciente());
-            ps.setString(2, atendimento.getIntencaoUsuario());
-            ps.setString(3, atendimento.getTextoResposta());
+        String sqlId = "SELECT NVL(MAX(ID_ATENDIMENTO), 0) + 1 FROM " + TABLE_NAME;
+        String sqlInsert = "INSERT INTO " + TABLE_NAME +
+                " (ID_ATENDIMENTO, ID_PACIENTE, HR_INTERACAO, ID_INTENCAO_USUARIO, TXT_RESPOSTA) " +
+                "VALUES (?, ?, ?, ?, ?)";
 
-            if (ps.executeUpdate() > 0) {
+        try (PreparedStatement psId = ConnectionFactory.getConnection().prepareStatement(sqlId);
+             PreparedStatement psInsert = ConnectionFactory.getConnection().prepareStatement(sqlInsert)) {
+
+            ResultSet rs = psId.executeQuery();
+            Long novoId = 1L;
+            if (rs.next()) {
+                novoId = rs.getLong(1);
+            }
+            atendimento.setIdAtendimento(novoId);
+
+            psInsert.setLong(1, novoId);
+            psInsert.setLong(2, atendimento.getIdPaciente());
+            psInsert.setTimestamp(3, Timestamp.valueOf(atendimento.getHoraInteracao()));
+            psInsert.setString(4, atendimento.getIntencaoUsuario());
+            psInsert.setString(5, atendimento.getTextoResposta());
+
+            if (psInsert.executeUpdate() > 0) {
                 return atendimento;
             }
         } catch (SQLException e) {
