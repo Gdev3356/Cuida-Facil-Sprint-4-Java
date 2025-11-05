@@ -2,6 +2,7 @@ package br.com.fiap.dao;
 
 import br.com.fiap.to.ConsultaDetalhadaTO;
 import br.com.fiap.to.ConsultaTO;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -52,6 +53,7 @@ public class ConsultaDAO {
 
     public List<ConsultaDetalhadaTO> findAllDetalhadas() {
         List<ConsultaDetalhadaTO> consultas = new ArrayList<>();
+        Connection conn = null;
 
         String sql = """
             SELECT 
@@ -78,13 +80,15 @@ public class ConsultaDAO {
             ORDER BY C.DT_CONSULTA DESC
         """;
 
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try {
+            conn = ConnectionFactory.getConnection();
+            try (PreparedStatement ps = conn.prepareStatement(sql);
+                 ResultSet rs = ps.executeQuery()) {
 
-            while (rs.next()) {
-                consultas.add(mapResultSetToDTO(rs));
+                while (rs.next()) {
+                    consultas.add(mapResultSetToDTO(rs));
+                }
             }
-
         } catch (SQLException e) {
             System.out.println("Erro ao buscar consultas detalhadas: " + e.getMessage());
         } finally {
@@ -96,6 +100,7 @@ public class ConsultaDAO {
 
     public ConsultaDetalhadaTO findByIdDetalhada(Long id) {
         ConsultaDetalhadaTO consulta = null;
+        Connection conn = null;
 
         String sql = """
             SELECT 
@@ -122,15 +127,17 @@ public class ConsultaDAO {
             WHERE C.ID_CONSULTA = ?
         """;
 
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
-            ps.setLong(1, id);
+        try {
+            conn = ConnectionFactory.getConnection();
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setLong(1, id);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    consulta = mapResultSetToDTO(rs);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        consulta = mapResultSetToDTO(rs);
+                    }
                 }
             }
-
         } catch (SQLException e) {
             System.out.println("Erro ao buscar consulta detalhada por ID: " + e.getMessage());
         } finally {
@@ -142,15 +149,18 @@ public class ConsultaDAO {
 
     public List<ConsultaTO> findAll() {
         List<ConsultaTO> consultas = new ArrayList<>();
+        Connection conn = null;
         String sql = "SELECT * FROM " + TABLE_NAME + " ORDER BY DT_CONSULTA DESC";
 
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try {
+            conn = ConnectionFactory.getConnection();
+            try (PreparedStatement ps = conn.prepareStatement(sql);
+                 ResultSet rs = ps.executeQuery()) {
 
-            while (rs.next()) {
-                consultas.add(mapResultSetToTO(rs));
+                while (rs.next()) {
+                    consultas.add(mapResultSetToTO(rs));
+                }
             }
-
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findAll Consulta): " + e.getMessage());
         } finally {
@@ -162,17 +172,20 @@ public class ConsultaDAO {
 
     public ConsultaTO findById(Long id) {
         ConsultaTO consulta = null;
+        Connection conn = null;
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE ID_CONSULTA = ?";
 
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
-            ps.setLong(1, id);
+        try {
+            conn = ConnectionFactory.getConnection();
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setLong(1, id);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    consulta = mapResultSetToTO(rs);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        consulta = mapResultSetToTO(rs);
+                    }
                 }
             }
-
         } catch (SQLException e) {
             System.out.println("Erro na consulta (findById Consulta): " + e.getMessage());
         } finally {
@@ -183,6 +196,7 @@ public class ConsultaDAO {
     }
 
     public ConsultaTO save(ConsultaTO consulta) {
+        Connection conn = null;
         String sqlId = "SELECT NVL(MAX(ID_CONSULTA), 0) + 1 FROM " + TABLE_NAME;
         String sqlInsert = "INSERT INTO " + TABLE_NAME +
                            " (ID_CONSULTA, CD_PROTOCOLO, DT_CONSULTA, FL_STATUS, TP_ATENDIMENTO, " +
@@ -200,11 +214,13 @@ public class ConsultaDAO {
         System.out.println("ID Especialidade: " + consulta.getIdEspecialidade());
         System.out.println("==================================");
 
-        try (PreparedStatement psId = ConnectionFactory.getConnection().prepareStatement(sqlId);
-             PreparedStatement psInsert = ConnectionFactory.getConnection().prepareStatement(sqlInsert)) {
+        try {
+            conn = ConnectionFactory.getConnection();
 
+            // Buscar próximo ID
             Long novoId = 1L;
-            try (ResultSet rs = psId.executeQuery()) {
+            try (PreparedStatement psId = conn.prepareStatement(sqlId);
+                 ResultSet rs = psId.executeQuery()) {
                 if (rs.next()) {
                     novoId = rs.getLong(1);
                 }
@@ -212,31 +228,32 @@ public class ConsultaDAO {
 
             consulta.setIdConsulta(novoId);
 
-            psInsert.setLong(1, novoId);
-            psInsert.setString(2, consulta.getProtocolo());
-            psInsert.setTimestamp(3, Timestamp.valueOf(consulta.getDataConsulta()));
-            psInsert.setString(4, consulta.getStatus());
-            psInsert.setString(5, consulta.getTipoAtendimento());
-            psInsert.setLong(6, consulta.getIdPaciente());
-            psInsert.setLong(7, consulta.getIdMedico());
-            psInsert.setLong(8, consulta.getIdUnidade());
-            psInsert.setLong(9, consulta.getIdEspecialidade());
+            // Inserir consulta
+            try (PreparedStatement psInsert = conn.prepareStatement(sqlInsert)) {
+                psInsert.setLong(1, novoId);
+                psInsert.setString(2, consulta.getProtocolo());
+                psInsert.setTimestamp(3, Timestamp.valueOf(consulta.getDataConsulta()));
+                psInsert.setString(4, consulta.getStatus());
+                psInsert.setString(5, consulta.getTipoAtendimento());
+                psInsert.setLong(6, consulta.getIdPaciente());
+                psInsert.setLong(7, consulta.getIdMedico());
+                psInsert.setLong(8, consulta.getIdUnidade());
+                psInsert.setLong(9, consulta.getIdEspecialidade());
 
-            System.out.println("Executando INSERT com ID_UNIDADE = " + consulta.getIdUnidade());
+                System.out.println("Executando INSERT com ID_UNIDADE = " + consulta.getIdUnidade());
 
-            int rowsAffected = psInsert.executeUpdate();
+                int rowsAffected = psInsert.executeUpdate();
+                System.out.println("Linhas afetadas: " + rowsAffected);
 
-            System.out.println("Linhas afetadas: " + rowsAffected);
-
-            if (rowsAffected > 0) {
-                System.out.println("Consulta salva com sucesso! ID: " + novoId);
-                return consulta;
+                if (rowsAffected > 0) {
+                    System.out.println("Consulta salva com sucesso! ID: " + novoId);
+                    return consulta;
+                }
             }
         } catch (SQLException e) {
             System.err.println("ERRO SQL ao salvar consulta: " + e.getMessage());
             System.err.println("SQL State: " + e.getSQLState());
             System.err.println("Error Code: " + e.getErrorCode());
-            e.printStackTrace();
         } finally {
             ConnectionFactory.closeConnection();
         }
@@ -245,11 +262,15 @@ public class ConsultaDAO {
     }
 
     public boolean delete(Long id) {
+        Connection conn = null;
         String sql = "DELETE FROM " + TABLE_NAME + " WHERE ID_CONSULTA = ?";
 
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
-            ps.setLong(1, id);
-            return ps.executeUpdate() > 0;
+        try {
+            conn = ConnectionFactory.getConnection();
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setLong(1, id);
+                return ps.executeUpdate() > 0;
+            }
         } catch (SQLException e) {
             System.out.println("Erro ao excluir (Consulta): " + e.getMessage());
         } finally {
@@ -260,24 +281,28 @@ public class ConsultaDAO {
     }
 
     public ConsultaTO update(ConsultaTO consulta) {
+        Connection conn = null;
         String sql = "UPDATE " + TABLE_NAME +
                      " SET CD_PROTOCOLO=?, DT_CONSULTA=?, FL_STATUS=?, TP_ATENDIMENTO=?, " +
                      "ID_PACIENTE=?, ID_MEDICO=?, ID_UNIDADE=?, ID_ESPECIALIDADE=? " +
                      "WHERE ID_CONSULTA=?";
 
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
-            ps.setString(1, consulta.getProtocolo());
-            ps.setTimestamp(2, Timestamp.valueOf(consulta.getDataConsulta()));
-            ps.setString(3, consulta.getStatus());
-            ps.setString(4, consulta.getTipoAtendimento());
-            ps.setLong(5, consulta.getIdPaciente());
-            ps.setLong(6, consulta.getIdMedico());
-            ps.setLong(7, consulta.getIdUnidade());
-            ps.setLong(8, consulta.getIdEspecialidade());
-            ps.setLong(9, consulta.getIdConsulta());
+        try {
+            conn = ConnectionFactory.getConnection();
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, consulta.getProtocolo());
+                ps.setTimestamp(2, Timestamp.valueOf(consulta.getDataConsulta()));
+                ps.setString(3, consulta.getStatus());
+                ps.setString(4, consulta.getTipoAtendimento());
+                ps.setLong(5, consulta.getIdPaciente());
+                ps.setLong(6, consulta.getIdMedico());
+                ps.setLong(7, consulta.getIdUnidade());
+                ps.setLong(8, consulta.getIdEspecialidade());
+                ps.setLong(9, consulta.getIdConsulta());
 
-            if (ps.executeUpdate() > 0) {
-                return consulta;
+                if (ps.executeUpdate() > 0) {
+                    return consulta;
+                }
             }
         } catch (SQLException e) {
             System.out.println("Erro ao atualizar (Consulta): " + e.getMessage());
