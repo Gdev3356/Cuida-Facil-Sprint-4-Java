@@ -89,7 +89,7 @@ public class PacienteDAO {
         return paciente;
     }
 
-    public PacienteTO save(PacienteTO paciente) {
+    public PacienteTO save(PacienteTO paciente) throws DAOException {
         String sql = "INSERT INTO " + TABLE_NAME +
                      " (CPF_PACIENTE, NM_PACIENTE, TEL_PACIENTE, EMAIL_PACIENTE, NASC_PACIENTE, CEP_PACIENTE) " +
                      "VALUES (?, ?, ?, ?, ?, ?)";
@@ -103,15 +103,23 @@ public class PacienteDAO {
             ps.setString(6, paciente.getCep());
 
             if (ps.executeUpdate() > 0) {
-                return paciente;
+                PacienteTO pacienteSalvo = findByCpf(paciente.getCpf());
+
+                if (pacienteSalvo != null && pacienteSalvo.getIdPaciente() != null) {
+                    System.out.println("Paciente salvo com ID: " + pacienteSalvo.getIdPaciente());
+                    return pacienteSalvo;
+                }
+                System.out.println("Erro: Paciente inserido mas ID não recuperado");
+                return null;
             }
+            System.out.println("Erro: Nenhuma linha foi inserida");
+            return null;
+
         } catch (SQLException e) {
-            System.out.println("Erro ao salvar (Paciente): " + e.getMessage());
+            throw new DAOException("Erro ao salvar paciente: " + e.getMessage(), e);
         } finally {
             ConnectionFactory.closeConnection();
         }
-
-        return null;
     }
 
     public boolean delete(Long id) {
