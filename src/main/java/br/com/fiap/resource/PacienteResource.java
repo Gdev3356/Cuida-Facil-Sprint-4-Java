@@ -55,9 +55,10 @@ public class PacienteResource {
     public Response save(@Valid PacienteTO paciente) {
         try {
             PacienteTO resultado = pacienteBO.save(paciente);
-            return Response.created(null) // 201 Created
+            return Response.status(Response.Status.CREATED) // 201 Created
                     .entity(resultado)
                     .build();
+
         } catch (BusinessRuleException e) {
             return Response.status(Response.Status.BAD_REQUEST) // 400 Bad Request
                     .entity(e.getMessage())

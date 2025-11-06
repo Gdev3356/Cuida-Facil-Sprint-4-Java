@@ -8,7 +8,7 @@ public class UnidadeTO {
     private Long idUnidade;
 
     @NotBlank
-    @Size(max = 20)
+    @Size(max = 50)
     private String cdUnidade;
 
     @NotBlank
